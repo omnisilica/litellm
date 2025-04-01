@@ -2296,8 +2296,8 @@ jobs:
   #           curl -X POST "https://proxyloadtester-production.up.railway.app/start/load/test?version=${VERSION}&commit_hash=${CIRCLE_SHA1}&release_type=nightly"
 
   e2e_ui_testing:
-    machine:
-      image: ubuntu-2204:2023.10.1
+    # machine:
+    #   image: ubuntu-2204:2023.10.1
     resource_class: xlarge
     working_directory: ~/project
     steps:
