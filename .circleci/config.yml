@@ -3,18 +3,18 @@ orbs:
   codecov: codecov/codecov@4.0.1
   node: circleci/node@5.1.0 # Add this line to declare the node orb
 
-commands:
-  setup_google_dns:
-    steps:
-      - run:
-          name: "Configure Google DNS"
-          command: |
-            # Backup original resolv.conf
-            sudo cp /etc/resolv.conf /etc/resolv.conf.backup
-            # Add both local and Google DNS servers
-            echo "nameserver 127.0.0.11" | sudo tee /etc/resolv.conf
-            echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
-            echo "nameserver 8.8.4.4" | sudo tee -a /etc/resolv.conf
+# commands:
+#   setup_google_dns:
+#     steps:
+#       - run:
+#           name: "Configure Google DNS"
+#           command: |
+#             # Backup original resolv.conf
+#             sudo cp /etc/resolv.conf /etc/resolv.conf.backup
+#             # Add both local and Google DNS servers
+#             echo "nameserver 127.0.0.11" | sudo tee /etc/resolv.conf
+#             echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
+#             echo "nameserver 8.8.4.4" | sudo tee -a /etc/resolv.conf
 
 jobs:
   # local_testing:
@@ -2295,118 +2295,143 @@ jobs:
   #           echo "triggering load testing server for version ${VERSION} and commit ${CIRCLE_SHA1}"
   #           curl -X POST "https://proxyloadtester-production.up.railway.app/start/load/test?version=${VERSION}&commit_hash=${CIRCLE_SHA1}&release_type=nightly"
 
-  e2e_ui_testing:
-    machine:
-      image: ubuntu-2204:2023.10.1
-    resource_class: xlarge
-    working_directory: ~/project
+  # e2e_ui_testing:
+  #   machine:
+  #     image: ubuntu-2204:2023.10.1
+  #   resource_class: xlarge
+  #   working_directory: ~/project
+  #   steps:
+  #     - checkout
+  #     - setup_google_dns
+  #     - run:
+  #         name: Build UI
+  #         command: |
+  #           # Set up nvm
+  #           export NVM_DIR="/opt/circleci/.nvm"
+  #           source "$NVM_DIR/nvm.sh"
+  #           source "$NVM_DIR/bash_completion"
+
+  #           # Install and use Node version
+  #           nvm install v18.17.0
+  #           nvm use v18.17.0
+
+  #           cd ui/litellm-dashboard
+
+  #           # Install dependencies first
+  #           npm install
+
+  #           # Now source the build script
+  #           source ./build_ui.sh
+  #     - run:
+  #         name: Install Docker CLI (In case it's not already installed)
+  #         command: |
+  #           sudo apt-get update
+  #           sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+  #     - run:
+  #         name: Install Python 3.9
+  #         command: |
+  #           curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh --output miniconda.sh
+  #           bash miniconda.sh -b -p $HOME/miniconda
+  #           export PATH="$HOME/miniconda/bin:$PATH"
+  #           conda init bash
+  #           source ~/.bashrc
+  #           conda create -n myenv python=3.9 -y
+  #           conda activate myenv
+  #           python --version
+  #     - run:
+  #         name: Install Dependencies
+  #         command: |
+  #           npm install -D @playwright/test
+  #           npm install @google-cloud/vertexai
+  #           pip install "pytest==7.3.1"
+  #           pip install "pytest-retry==1.6.3"
+  #           pip install "pytest-asyncio==0.21.1"
+  #           pip install aiohttp
+  #           pip install "openai==1.68.2"
+  #           python -m pip install --upgrade pip
+  #           pip install "pydantic==2.10.2"
+  #           pip install "pytest==7.3.1"
+  #           pip install "pytest-mock==3.12.0"
+  #           pip install "pytest-asyncio==0.21.1"
+  #           pip install mypy
+  #           pip install pyarrow
+  #           pip install numpydoc
+  #           pip install prisma
+  #           pip install fastapi
+  #           pip install jsonschema
+  #           pip install "httpx==0.24.1"
+  #           pip install "anyio==3.7.1"
+  #           pip install "asyncio==3.4.3"
+  #     - run:
+  #         name: Install Playwright Browsers
+  #         command: |
+  #           npx playwright install
+
+  #     - run:
+  #         name: Build Docker image
+  #         command: docker build -t my-app:latest -f ./docker/Dockerfile.database .
+  #     - run:
+  #         name: Run Docker container
+  #         command: |
+  #           docker run -d \
+  #             -p 4000:4000 \
+  #             -e DATABASE_URL=$SMALL_DATABASE_URL \
+  #             -e LITELLM_MASTER_KEY="sk-1234" \
+  #             -e OPENAI_API_KEY=$OPENAI_API_KEY \
+  #             -e UI_USERNAME="admin" \
+  #             -e UI_PASSWORD="gm" \
+  #             -e LITELLM_LICENSE=$LITELLM_LICENSE \
+  #             --name my-app \
+  #             -v $(pwd)/litellm/proxy/example_config_yaml/simple_config.yaml:/app/config.yaml \
+  #             my-app:latest \
+  #             --config /app/config.yaml \
+  #             --port 4000 \
+  #             --detailed_debug
+  #     - run:
+  #         name: Install curl and dockerize
+  #         command: |
+  #           sudo apt-get update
+  #           sudo apt-get install -y curl
+  #           sudo wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz
+  #           sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz
+  #           sudo rm dockerize-linux-amd64-v0.6.1.tar.gz
+  #     - run:
+  #         name: Start outputting logs
+  #         command: docker logs -f my-app
+  #         background: true
+  #     - run:
+  #         name: Wait for app to be ready
+  #         command: dockerize -wait http://localhost:4000 -timeout 5m
+  #     - run:
+  #         name: Run Playwright Tests
+  #         command: |
+  #           npx playwright test e2e_ui_tests/ --reporter=html --output=test-results
+  #         no_output_timeout: 120m
+  #     - store_test_results:
+  #         path: test-results
+
+    e2e_ui_testing_litellm_ci_sim:
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.27.1-focal
+    # Steps to the job
     steps:
       - checkout
-      - setup_google_dns
       - run:
-          name: Build UI
-          command: |
-            # Set up nvm
-            export NVM_DIR="/opt/circleci/.nvm"
-            source "$NVM_DIR/nvm.sh"
-            source "$NVM_DIR/bash_completion"
-
-            # Install and use Node version
-            nvm install v18.17.0
-            nvm use v18.17.0
-
-            cd ui/litellm-dashboard
-
-            # Install dependencies first
-            npm install
-
-            # Now source the build script
-            source ./build_ui.sh
+          name: Download dependency
+          environment:
+            SECRET_KEY: SECRET_KEY 
+          command: npm ci
       - run:
-          name: Install Docker CLI (In case it's not already installed)
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-      - run:
-          name: Install Python 3.9
-          command: |
-            curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh --output miniconda.sh
-            bash miniconda.sh -b -p $HOME/miniconda
-            export PATH="$HOME/miniconda/bin:$PATH"
-            conda init bash
-            source ~/.bashrc
-            conda create -n myenv python=3.9 -y
-            conda activate myenv
-            python --version
-      - run:
-          name: Install Dependencies
-          command: |
-            npm install -D @playwright/test
-            npm install @google-cloud/vertexai
-            pip install "pytest==7.3.1"
-            pip install "pytest-retry==1.6.3"
-            pip install "pytest-asyncio==0.21.1"
-            pip install aiohttp
-            pip install "openai==1.68.2"
-            python -m pip install --upgrade pip
-            pip install "pydantic==2.10.2"
-            pip install "pytest==7.3.1"
-            pip install "pytest-mock==3.12.0"
-            pip install "pytest-asyncio==0.21.1"
-            pip install mypy
-            pip install pyarrow
-            pip install numpydoc
-            pip install prisma
-            pip install fastapi
-            pip install jsonschema
-            pip install "httpx==0.24.1"
-            pip install "anyio==3.7.1"
-            pip install "asyncio==3.4.3"
+          name: Navigate to proxy_admin_ui_tests
       - run:
           name: Install Playwright Browsers
           command: |
+            npm install playwright
             npx playwright install
-
       - run:
-          name: Build Docker image
-          command: docker build -t my-app:latest -f ./docker/Dockerfile.database .
-      - run:
-          name: Run Docker container
+          name: Run tests
           command: |
-            docker run -d \
-              -p 4000:4000 \
-              -e DATABASE_URL=$SMALL_DATABASE_URL \
-              -e LITELLM_MASTER_KEY="sk-1234" \
-              -e OPENAI_API_KEY=$OPENAI_API_KEY \
-              -e UI_USERNAME="admin" \
-              -e UI_PASSWORD="gm" \
-              -e LITELLM_LICENSE=$LITELLM_LICENSE \
-              --name my-app \
-              -v $(pwd)/litellm/proxy/example_config_yaml/simple_config.yaml:/app/config.yaml \
-              my-app:latest \
-              --config /app/config.yaml \
-              --port 4000 \
-              --detailed_debug
-      - run:
-          name: Install curl and dockerize
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y curl
-            sudo wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz
-            sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz
-            sudo rm dockerize-linux-amd64-v0.6.1.tar.gz
-      - run:
-          name: Start outputting logs
-          command: docker logs -f my-app
-          background: true
-      - run:
-          name: Wait for app to be ready
-          command: dockerize -wait http://localhost:4000 -timeout 5m
-      - run:
-          name: Run Playwright Tests
-          command: |
-            npx playwright test e2e_ui_tests/ --reporter=html --output=test-results
-          no_output_timeout: 120m
+            npx playwright test
       - store_test_results:
           path: test-results
 
@@ -2527,12 +2552,17 @@ workflows:
       #         only:
       #           - main
       #           - /litellm_.*/
-      - e2e_ui_testing:
-          filters:
-            branches:
-              only:
-                - litellm-ci-sim
-                - /litellm_.*/
+      # - e2e_ui_testing:
+      #     filters:
+      #       branches:
+      #         only:
+      #           - litellm-ci-sim
+      #           - /litellm_.*/
+        - e2e_ui_testing_litellm_ci_sim:
+            filters:
+              branches:
+               only:
+                 - litellm-ci-sim
       # - build_and_test:
       #     filters:
       #       branches:
